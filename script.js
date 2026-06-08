@@ -233,7 +233,7 @@ btnNextService.addEventListener('click', () => {
 // --- PANTALLA 5: ENVIAR A WHATSAPP ---
 btnSubmitOrder.addEventListener('click', () => {
     // Código de país 593 para Ecuador seguido de tu número móvil
-    const tuNumeroTelefono = "593999999999"; // <-- REEMPLAZA AQUÍ CON TU NÚMERO REAL
+    const tuNumeroTelefono = "593962059311"; // <-- REEMPLAZA AQUÍ CON TU NÚMERO REAL
 
     // Formateo limpio: Se eliminan emojis conflictivos y se aseguran las negritas de WhatsApp
     const mensajeWhatsApp = 

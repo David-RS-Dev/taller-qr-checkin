@@ -240,7 +240,7 @@ btnSubmitOrder.addEventListener('click', () => {
         `*NUEVA ORDEN DE SERVICIO - TALLER*\n\n` +
         `*Vehiculo:* ${userOrder.brand}\n` +
         `*Modelo:* ${userOrder.model}\n` +
-        `*Anio:* ${userOrder.year}\n` +
+        `*Año:* ${userOrder.year}\n` +
         `*Servicio requerido:* ${userOrder.service}\n\n` +
         `_Enviado desde el codigo QR del taller._`;
 

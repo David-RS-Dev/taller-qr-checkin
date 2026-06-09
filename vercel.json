@@ -2,7 +2,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "https://wa.me/593962059311?text=Hola%2C%20quiero%20cotizar%20el%20cambio%20de%20pastillas%20de%20mi%20auto.",
+      "destination": "whatsapp://send?phone=593962059311&text=Hola%2C%20quiero%20cotizar%20el%20cambio%20de%20pastillas%20de%20mi%20auto.",
       "permanent": false
     }
   ]

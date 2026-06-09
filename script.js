@@ -230,12 +230,12 @@ btnNextService.addEventListener('click', () => {
 });
 
 
-// --- PANTALLA 5: ENVIAR A WHATSAPP ---
+// --- PANTALLA 5: ENVIAR A WHATSAPP (VERSIÓN ULTRA-COMPATIBLE MÓVIL) ---
 btnSubmitOrder.addEventListener('click', () => {
     // Código de país 593 para Ecuador seguido de tu número móvil
-    const tuNumeroTelefono = "593962059311"; // <-- REEMPLAZA AQUÍ CON TU NÚMERO REAL
+    const tuNumeroTelefono = "593962059311"; 
 
-    // Formateo limpio: Se eliminan emojis conflictivos y se aseguran las negritas de WhatsApp
+    // Formateo limpio en negritas
     const mensajeWhatsApp = 
         `*NUEVA ORDEN DE SERVICIO - TALLER*\n\n` +
         `*Vehiculo:* ${userOrder.brand}\n` +
@@ -244,12 +244,13 @@ btnSubmitOrder.addEventListener('click', () => {
         `*Servicio requerido:* ${userOrder.service}\n\n` +
         `_Enviado desde el codigo QR del taller._`;
 
-    // encodeURIComponent se encarga de empaquetar saltos de línea y espacios de forma segura para la URL
+    // Codificar de forma segura para URLs
     const mensajeCodificado = encodeURIComponent(mensajeWhatsApp);
 
-    // Enlace de redirección
-    const urlWhatsApp = `https://wa.me/${tuNumeroTelefono}?text=${mensajeCodificado}`;
+    // CAMBIO CLAVE: Usamos api.whatsapp.com en lugar de wa.me para evitar el bucle de la Play Store
+    const urlWhatsApp = `https://api.whatsapp.com/send?phone=${tuNumeroTelefono}&text=${mensajeCodificado}`;
 
+    // Redirección directa
     window.location.href = urlWhatsApp;
 });
 

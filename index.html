@@ -1,25 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Cargando...</title>
-    <script>
-        const phone = "593962059311";
-        const text = encodeURIComponent("Hola, quiero cotizar el cambio de pastillas de mi auto.");
-        
-        // Intentar abrir WhatsApp directamente
-        window.location.href = `whatsapp://send?phone=${phone}&text=${text}`;
-        
-        // Si no funciona en 2 segundos, intentar wa.me
-        setTimeout(() => {
-            window.location.href = `https://wa.me/${phone}?text=${text}`;
-        }, 2000);
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in Freno Perfecto</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <p>Abriendo WhatsApp...</p>
-    <a href="https://wa.me/593962059311?text=Hola%2C%20quiero%20cotizar%20el%20cambio%20de%20pastillas%20de%20mi%20auto.">
-        Si no se abre, toca aquí
-    </a>
+
+    <main class="app-container">
+        
+        <section id="step-final" class="step-section">
+            <div class="success-message-container">
+                <h2 class="step-title">¡Todo listo para tu atención!</h2>
+                <p class="step-subtitle">Escaneaste el código QR de Freno Perfecto con éxito.</p>
+            </div>
+            
+            <button id="btn-submit-order" class="btn-submit">INICIAR COTIZACIÓN</button>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,95 +1,25 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Expertos en Frenos</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{
-            background: #0a0a0a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-            padding: 20px;
-        }
-        .card{
-            max-width: 400px;
-            width: 100%;
-            background: #1a1a1a;
-            border-radius: 32px;
-            padding: 32px 24px;
-            text-align: center;
-            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.5);
-            border: 1px solid #2a2a2a;
-        }
-        .logo{font-size: 48px;margin-bottom: 16px;}
-        h1{color: #fff;font-size: 24px;margin-bottom: 8px;font-weight: 600;}
-        .sub{color: #a0a0a0;font-size: 14px;margin-bottom: 24px;}
-        .whatsapp-button{
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: #25D366;
-            color: #fff;
-            padding: 14px 28px;
-            border-radius: 60px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(37,211,102,0.3);
-            border: none;
-            cursor: pointer;
-        }
-        .whatsapp-button:active{transform: scale(0.98);background: #20b859;}
-        .footer{color: #555;font-size: 12px;margin-top: 24px;}
-    </style>
+    <title>Cargando...</title>
+    <script>
+        const phone = "593962059311";
+        const text = encodeURIComponent("Hola, quiero cotizar el cambio de pastillas de mi auto.");
+        
+        // Intentar abrir WhatsApp directamente
+        window.location.href = `whatsapp://send?phone=${phone}&text=${text}`;
+        
+        // Si no funciona en 2 segundos, intentar wa.me
+        setTimeout(() => {
+            window.location.href = `https://wa.me/${phone}?text=${text}`;
+        }, 2000);
+    </script>
 </head>
 <body>
-    <div class="card">
-        <div class="logo">🔧</div>
-        <h1>Expertos en Frenos</h1>
-        <div class="sub">Especialistas en cambio de pastillas y rectificación de discos</div>
-
-        <a href="#" id="whatsapp-btn" class="whatsapp-button">
-            📱 Abrir WhatsApp
-        </a>
-        <div class="footer">Toque el botón para cotizar • Atención inmediata</div>
-    </div>
-
-    <script>
-        // Configuración
-        const phoneNumber = "593962059311";
-        const textMessage = "Hola%2C%20quiero%20cotizar%20el%20cambio%20de%20pastillas%20de%20mi%20auto.";
-        
-        // Creamos ambas URLs
-        const waMeUrl = `https://wa.me/${phoneNumber}?text=${textMessage}`;
-        const whatsappProtocolUrl = `whatsapp://send?phone=${phoneNumber}&text=${textMessage}`;
-
-        const button = document.getElementById('whatsapp-btn');
-
-        // Función para intentar abrir la app
-        function tryOpenApp() {
-            // Intento 1: Esquema nativo (whatsapp://)
-            window.location.href = whatsappProtocolUrl;
-
-            // Intento 2: Respaldo con wa.me si el esquema nativo falla
-            setTimeout(() => {
-                window.location.href = waMeUrl;
-            }, 150);
-        }
-
-        // Asignamos la función al botón
-        button.onclick = (e) => {
-            e.preventDefault();
-            tryOpenApp();
-        };
-
-        // Opcional: Intento automático al cargar la página
-        tryOpenApp();
-    </script>
+    <p>Abriendo WhatsApp...</p>
+    <a href="https://wa.me/593962059311?text=Hola%2C%20quiero%20cotizar%20el%20cambio%20de%20pastillas%20de%20mi%20auto.">
+        Si no se abre, toca aquí
+    </a>
 </body>
 </html>

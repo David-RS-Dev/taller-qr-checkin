@@ -10,10 +10,16 @@
         const mensajeWhatsApp = "Hola, quiero cotizar el cambio de pastillas de mi auto.";
         const mensajeCodificado = encodeURIComponent(mensajeWhatsApp);
 
-        window.location.href = `https://api.whatsapp.com/send?phone=${tuNumeroTelefono}&text=${mensajeCodificado}`;
+        // Intenta abrir directamente la aplicación de WhatsApp instalada
+        window.location.href = `whatsapp://send?phone=${tuNumeroTelefono}&text=${mensajeCodificado}`;
+
+        // Respaldo inmediato por si el teléfono bloquea el protocolo directo
+        setTimeout(function() {
+            window.location.href = `https://api.whatsapp.com/send?phone=${tuNumeroTelefono}&text=${mensajeCodificado}`;
+        }, 300);
     </script>
 
-    <meta http-equiv="refresh" content="0; url=https://api.whatsapp.com/send?phone=593962059311&text=Hola%2C%20quiero%20cotizar%20el%20cambio%20de%20pastillas%20de%20mi%20auto.">
+    <meta http-equiv="refresh" content="0; url=whatsapp://send?phone=593962059311&text=Hola%2C%20quiero%20cotizar%20el%20cambio%20de%20pastillas%20de%20mi%20auto.">
 </head>
 <body>
 </body>

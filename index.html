@@ -3,37 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expertos en Frenos - Redirigiendo...</title>
-    
-    <script>
-        const tuNumeroTelefono = "593962059311"; 
-        const mensajeWhatsApp = "Hola, quiero cotizar el cambio de pastillas de mi auto.";
-        const mensajeCodificado = encodeURIComponent(mensajeWhatsApp);
-        const whatsappURL = `https://wa.me/${tuNumeroTelefono}?text=${mensajeCodificado}`;
-
-        // Intentar redirección inmediata
-        window.location.href = whatsappURL;
-        
-        // Si no funciona en 2 segundos, mostrar botón
-        setTimeout(() => {
-            document.getElementById('fallback-btn').style.display = 'block';
-            document.getElementById('loading-text').textContent = 'Si no se abrió WhatsApp automáticamente...';
-        }, 2000);
-    </script>
+    <title>Check-in Taller</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body style="font-family: Arial, sans-serif; text-align: center; padding: 50px 20px; background: #f5f5f5;">
-    <div style="max-width: 400px; margin: 0 auto;">
-        <h2 style="color: #25D366; margin-bottom: 20px;"> Expertos en Frenos</h2>
-        <p id="loading-text" style="color: #666; margin-bottom: 30px;">Abriendo WhatsApp...</p>
+<body>
+
+    <main class="app-container">
         
-        <a id="fallback-btn" href="https://wa.me/593962059311?text=Hola%2C%20quiero%20cotizar%20el%20cambio%20de%20pastillas%20de%20mi%20auto." 
-           style="display: none; background: #25D366; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px;">
-           TOCAR PARA ABRIR WHATSAPP
-        </a>
-        
-        <p style="color: #999; font-size: 14px; margin-top: 30px;">
-            Si tienes problemas, asegúrate de tener WhatsApp instalado
-        </p>
-    </div>
+        <section id="step-brand" class="step-section">
+            <h2 class="step-title">Selecciona la marca de tu vehículo</h2>
+            <div id="brand-options" class="options-grid"></div>
+            
+            <div id="custom-brand-container" class="custom-input-container hidden">
+                <label for="custom-brand" class="input-label">Escribe la marca:</label>
+                <input type="text" id="custom-brand" class="input-field" placeholder="Ej. Porsche">
+                <button id="btn-next-brand" class="btn-next">Continuar</button>
+            </div>
+        </section>
+
+        <section id="step-model" class="step-section hidden">
+            <h2 class="step-title">Selecciona el modelo</h2>
+            <div id="model-options" class="options-grid"></div>
+
+            <div id="custom-model-container" class="custom-input-container hidden">
+                <label for="custom-model" class="input-label">Escribe el modelo:</label>
+                <input type="text" id="custom-model" class="input-field" placeholder="Ej. Macan">
+                <button id="btn-next-model" class="btn-next">Continuar</button>
+            </div>
+        </section>
+
+        <section id="step-year" class="step-section hidden">
+            <h2 class="step-title">¿De qué año es tu vehículo?</h2>
+            <div class="form-group">
+                <label for="year-select" class="input-label">Selecciona de la lista:</label>
+                <select id="year-select" class="select-field">
+                    <option value="" disabled selected>Elige un año...</option>
+                </select>
+            </div>
+            
+            <div class="divider">ó</div>
+
+            <div class="form-group">
+                <label for="custom-year" class="input-label">Escríbelo directamente:</label>
+                <input type="number" id="custom-year" class="input-field" min="1950" max="2026" placeholder="Ej. 2018">
+            </div>
+
+            <button id="btn-next-year" class="btn-next">Continuar</button>
+        </section>
+
+        <section id="step-service" class="step-section hidden">
+            <h2 class="step-title">¿Qué servicio requiere tu vehículo?</h2>
+            <div id="service-options" class="options-grid"></div>
+
+            <div id="custom-service-container" class="custom-input-container hidden">
+                <label for="custom-service" class="input-label">Describe el servicio o falla:</label>
+                <textarea id="custom-service" class="textarea-field" placeholder="Ej. Ruido extraño en la suspensión delantera..."></textarea>
+                <button id="btn-next-service" class="btn-next">Continuar</button>
+            </div>
+        </section>
+
+        <section id="step-final" class="step-section hidden">
+            <div class="success-message-container">
+                <h2 class="step-title">¡Tu orden está lista!</h2>
+                <p class="step-subtitle">Todos los datos requeridos han sido completados con éxito.</p>
+            </div>
+            
+            <button id="btn-submit-order" class="btn-submit">ENVIAR A DAVID</button>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>

@@ -3,15 +3,13 @@
 // ==========================================
 const vehicleData = {
     "BMW": ["X5", "330i", "M3", "X3"],
-    "Chevrolet": ["Sail", "Tracker", "Onix", "Captiva"],
+    "Chevrolet": ["Aveo","Sail", "Tracker", "Onix", "Captiva"],
     "Ford": ["F-150", "Explorer", "Ranger", "Fiesta"],
     "Toyota": ["Hilux", "Corolla", "RAV4", "Yaris"]
 };
 
 const servicesList = [
     "Cambio de Pastillas",
-    "Cambio de Aceite",
-    "Revisión General"
 ];
 
 // ==========================================

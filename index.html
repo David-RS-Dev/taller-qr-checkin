@@ -3,76 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check-in Taller</title>
+    <title>Cotizador Automático - Freno Perfecto</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <main class="app-container">
-        
-        <section id="step-brand" class="step-section">
-            <h2 class="step-title">Selecciona la marca de tu vehículo</h2>
-            <div id="brand-options" class="options-grid"></div>
+    <header class="main-header">
+        <div class="header-container">
+            <h1>Freno Perfecto</h1>
+            <p class="subtitle">Especialistas en Frenos Automotrices</p>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="card form-section">
+            <h2>Nueva Cotización</h2>
+            <form id="quoteForm" novalidate>
+                
+                <div class="form-group">
+                    <label for="marcaSelect">Marca del Vehículo:</label>
+                    <select id="marcaSelect" required>
+                        <option value="" disabled selected>-- Seleccione una marca --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="modeloSelect">Modelo del Vehículo:</label>
+                    <select id="modeloSelect" disabled required>
+                        <option value="" disabled selected>-- Primero seleccione una marca --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="calidadSelect">Nivel de Calidad (Pastillas):</label>
+                    <select id="calidadSelect" required>
+                        <option value="ESTANDAR" selected>ESTÁNDAR (Recomendado)</option>
+                        <option value="URBANO">URBANO</option>
+                        <option value="PREMIUM">PREMIUM</option>
+                    </select>
+                    <small class="form-help-text">Nota: Vehículos premium no admiten nivel Urbano.</small>
+                </div>
+
+                <div class="form-group checkboxes">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="rectificacionCheck">
+                        Incluir Rectificación de Discos (Par Delantero)
+                    </label>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="clienteRepuestoCheck">
+                        El cliente trae sus propios repuestos (Solo Mano de Obra)
+                    </label>
+                </div>
+
+                <button type="button" id="btnCalcular" class="btn-primary">Calcular Cotización</button>
+
+            </form>
+        </section>
+
+        <section class="card result-section">
+            <h2>Resumen de la Cotización</h2>
             
-            <div id="custom-brand-container" class="custom-input-container hidden">
-                <label for="custom-brand" class="input-label">Escribe la marca:</label>
-                <input type="text" id="custom-brand" class="input-field" placeholder="Ej. Porsche">
-                <button id="btn-next-brand" class="btn-next">Continuar</button>
+            <div id="resultPlaceholder" class="placeholder-text">
+                <p>Ingrese los datos del vehículo y presione "Calcular Cotización" para generar el desglose.</p>
+            </div>
+
+            <div id="resultContent" class="result-content hidden">
+                <div class="result-header">
+                    <h3 id="resVehiculo">Marca Modelo</h3>
+                    <span id="resCategoria" class="badge">Categoría</span>
+                </div>
+
+                <div id="resMensaje" class="result-message"></div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Concepto / Servicio</th>
+                            <th class="text-right">Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resServiciosBody">
+                        </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total Neto (USD):</th>
+                            <th id="resTotal" class="text-right total-price">$0.00</th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="invoice-footer">
+                    <p>Precios sugeridos en base al menú oficial de tarifas de Freno Perfecto.</p>
+                </div>
             </div>
         </section>
-
-        <section id="step-model" class="step-section hidden">
-            <h2 class="step-title">Selecciona el modelo</h2>
-            <div id="model-options" class="options-grid"></div>
-
-            <div id="custom-model-container" class="custom-input-container hidden">
-                <label for="custom-model" class="input-label">Escribe el modelo:</label>
-                <input type="text" id="custom-model" class="input-field" placeholder="Ej. Macan">
-                <button id="btn-next-model" class="btn-next">Continuar</button>
-            </div>
-        </section>
-
-        <section id="step-year" class="step-section hidden">
-            <h2 class="step-title">¿De qué año es tu vehículo?</h2>
-            <div class="form-group">
-                <label for="year-select" class="input-label">Selecciona de la lista:</label>
-                <select id="year-select" class="select-field">
-                    <option value="" disabled selected>Elige un año...</option>
-                </select>
-            </div>
-            
-            <div class="divider">ó</div>
-
-            <div class="form-group">
-                <label for="custom-year" class="input-label">Escríbelo directamente:</label>
-                <input type="number" id="custom-year" class="input-field" min="1950" max="2026" placeholder="Ej. 2018">
-            </div>
-
-            <button id="btn-next-year" class="btn-next">Continuar</button>
-        </section>
-
-        <section id="step-service" class="step-section hidden">
-            <h2 class="step-title">¿Qué servicio requiere tu vehículo?</h2>
-            <div id="service-options" class="options-grid"></div>
-
-            <div id="custom-service-container" class="custom-input-container hidden">
-                <label for="custom-service" class="input-label">Describe el servicio o falla:</label>
-                <textarea id="custom-service" class="textarea-field" placeholder="Ej. Ruido extraño en la suspensión delantera..."></textarea>
-                <button id="btn-next-service" class="btn-next">Continuar</button>
-            </div>
-        </section>
-
-        <section id="step-final" class="step-section hidden">
-            <div class="success-message-container">
-                <h2 class="step-title">¡Tu orden está lista!</h2>
-                <p class="step-subtitle">Todos los datos requeridos han sido completados con éxito.</p>
-            </div>
-            
-            <button id="btn-submit-order" class="btn-submit">ENVIAR A DAVID</button>
-        </section>
-
     </main>
 
+    <footer class="main-footer">
+        <p>&copy; 2026 Freno Perfecto. Uso Interno y de Diagnóstico Empresarial.</p>
+    </footer>
+
     <script src="script.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Verificar que el archivo lógico se cargó correctamente
+            if (typeof getAllMarcas !== 'function') {
+                console.error("Error: 'freno-perfecto.js' no se ha cargado o no expone las funciones necesarias.");
+                return;
+            }
+
+            // Elementos del DOM
+            const marcaSelect = document.getElementById("marcaSelect");
+            const modeloSelect = document.getElementById("modeloSelect");
+            const calidadSelect = document.getElementById("calidadSelect");
+            const rectificacionCheck = document.getElementById("rectificacionCheck");
+            const clienteRepuestoCheck = document.getElementById("clienteRepuestoCheck");
+            const btnCalcular = document.getElementById("btnCalcular");
+            
+            const resultPlaceholder = document.getElementById("resultPlaceholder");
+            const resultContent = document.getElementById("resultContent");
+            const resVehiculo = document.getElementById("resVehiculo");
+            const resCategoria = document.getElementById("resCategoria");
+            const resMensaje = document.getElementById("resMensaje");
+            const resServiciosBody = document.getElementById("resServiciosBody");
+            const resTotal = document.getElementById("resTotal");
+
+            // 1. Poblar el selector de Marcas al iniciar
+            const marcas = getAllMarcas();
+            marcas.sort().forEach(marca => {
+                const option = document.createElement("option");
+                option.value = marca;
+                option.textContent = marca;
+                marcaSelect.appendChild(option);
+            });
+
+            // 2. Evento de cambio de Marca -> Actualizar Modelos
+            marcaSelect.addEventListener("change", () => {
+                const marcaSeleccionada = marcaSelect.value;
+                
+                // Limpiar modelos previos
+                modeloSelect.innerHTML = '<option value="" disabled selected>-- Seleccione un modelo --</option>';
+                
+                const modelos = getModelosByMarca(marcaSeleccionada);
+                if (modelos && modelos.length > 0) {
+                    modelos.sort().forEach(modelo => {
+                        const option = document.createElement("option");
+                        option.value = modelo;
+                        option.textContent = modelo;
+                        modeloSelect.appendChild(option);
+                    });
+                    modeloSelect.disabled = false;
+                } else {
+                    modeloSelect.disabled = true;
+                }
+            });
+
+            // 3. Evento Click para Calcular la Cotización
+            btnCalcular.addEventListener("click", () => {
+                const marca = marcaSelect.value;
+                const modelo = modeloSelect.value;
+                const calidad = calidadSelect.value;
+                const incluyeRectificacion = rectificacionCheck.checked;
+                const clienteTraeRepuesto = clienteRepuestoCheck.checked;
+
+                if (!marca || !modelo) {
+                    alert("Por favor, seleccione una Marca y un Modelo antes de continuar.");
+                    return;
+                }
+
+                // Invocar la lógica de negocio del archivo externo
+                const quote = generateQuote(marca, modelo, calidad, incluyeRectificacion, clienteTraeRepuesto);
+
+                // Renderizar los resultados en la UI
+                resultPlaceholder.classList.add("hidden");
+                resultContent.classList.remove("hidden");
+
+                resVehiculo.textContent = quote.vehiculo;
+                resCategoria.textContent = quote.categoria || "DESCONOCIDO";
+                resMensaje.textContent = quote.mensaje;
+
+                // Modificar estilos visuales del badge según el estado
+                resCategoria.className = "badge " + (quote.exito ? quote.categoria.toLowerCase().replace(/[^a-z0-trim]/g, "_") : "error");
+
+                // Limpiar tabla de servicios anterior
+                resServiciosBody.innerHTML = "";
+
+                if (quote.exito) {
+                    // Listar desglose de conceptos
+                    quote.servicios.forEach(serv => {
+                        const tr = document.createElement("tr");
+                        
+                        const tdConcepto = document.createElement("td");
+                        tdConcepto.innerHTML = serv.concepto + (serv.nota ? `<br><small class="text-muted">${serv.nota}</small>` : "");
+                        
+                        const tdPrecio = document.createElement("td");
+                        tdPrecio.className = "text-right";
+                        tdPrecio.textContent = serv.precio < 0 ? `-$${Math.abs(serv.precio)}.00` : `$${serv.precio}.00`;
+                        
+                        tr.appendChild(tdConcepto);
+                        tr.appendChild(tdPrecio);
+                        resServiciosBody.appendChild(tr);
+                    });
+
+                    resTotal.textContent = `$${quote.total}.00`;
+                    resTotal.classList.remove("text-error");
+                } else {
+                    // Mostrar caso de error controlado (Ej: Premium con Urbano o Datos Desconocidos)
+                    const tr = document.createElement("tr");
+                    const tdError = document.createElement("td");
+                    tdError.colSpan = 2;
+                    tdError.className = "text-center text-error";
+                    tdError.textContent = quote.accionRequerida || "Consulte la asistencia manual.";
+                    
+                    tr.appendChild(tdError);
+                    resServiciosBody.appendChild(tr);
+                    
+                    resTotal.textContent = "—";
+                    resTotal.classList.add("text-error");
+                }
+            });
+        });
+    </script>
 </body>
 </html>

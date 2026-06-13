@@ -1,0 +1,23 @@
+{
+  "Chevrolet": {
+    "Spark": { "tipo": "Auto pequeno" },
+    "Onix": { "tipo": "Sedan mediano" },
+    "Sail": { "tipo": "Sedan mediano" },
+    "Captiva": { "tipo": "SUV/ Camioneta mediana" },
+    "D-Max": { "tipo": "SUV grande/ Pickup" }
+  },
+  "Kia": {
+    "Picanto": { "tipo": "Auto pequeno" },
+    "Rio": { "tipo": "Sedan mediano" },
+    "Sportage": { "tipo": "SUV/ Camioneta mediana" }
+  },
+  "Toyota": {
+    "Corolla": { "tipo": "Sedan mediano" },
+    "Hilux": { "tipo": "SUV grande/ Pickup" },
+    "Rav4": { "tipo": "SUV/ Camioneta mediana" }
+  },
+  "BMW": {
+    "Serie 3": { "tipo": "Vehiculo premium" },
+    "X5": { "tipo": "Vehiculo premium" }
+  }
+}

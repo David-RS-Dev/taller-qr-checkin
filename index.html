@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cotizador de Frenos B2C</title>
+    <!-- Vinculación a la hoja de estilos (se creará en el siguiente paso) -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- RF1.2: Barra de Estado Interactiva Superior -->
+    <header id="status-bar" class="status-bar hidden">
+        <div class="status-container">
+            <span id="status-marca" class="status-item" onclick="volverAPaso(1)">Marca</span>
+            <span class="separator">></span>
+            <span id="status-modelo" class="status-item" onclick="volverAPaso(1)">Modelo</span>
+            <span class="separator">></span>
+            <span id="status-servicio" class="status-item" onclick="volverAPaso(2)">Servicio</span>
+        </div>
+    </header>
+
+    <main class="wizard-container">
+        
+        <!-- PASO 1: Identificación del Vehículo (RF1.1, RF1.3, Sección 3) -->
+        <section id="step-1" class="wizard-step active">
+            <h2>Identifica tu vehículo</h2>
+            <p class="helper-text">Escribe la marca de tu auto para comenzar:</p>
+            
+            <div class="input-group">
+                <input type="text" id="input-marca" placeholder="Ej: Chevrolet, Kia, Toyota..." autocomplete="off">
+                <div id="sugerencias-marca" class="sugerencias-box"></div>
+            </div>
+
+            <div class="input-group hidden" id="grupo-modelo">
+                <p class="helper-text">Ahora, selecciona el modelo:</p>
+                <input type="text" id="input-modelo" placeholder="Ej: Spark, Onix, Sportage..." autocomplete="off">
+                <div id="sugerencias-modelo" class="sugerencias-box"></div>
+            </div>
+
+            <!-- Asistencia por Matrícula (Sección 3) -->
+            <div class="matricula-ayuda">
+                <p class="helper-text">¿No estás seguro? <button id="btn-ayuda-matricula" class="btn-link">Ver mi Matrícula (AMT/ANT)</button></p>
+                <div id="panel-matricula" class="hidden">
+                    <img src="https://via.placeholder.com/300x150?text=Imagen+Matricula+Ecuador" alt="Ejemplo Matrícula" class="img-matricula">
+                    <p class="small-text">Busca los campos: <strong>MARCA</strong>, <strong>MODELO</strong> y <strong>CLASE</strong>.</p>
+                </div>
+            </div>
+
+            <button id="btn-continuar-1" class="btn-primary" disabled>Continuar</button>
+        </section>
+
+
+        <!-- PASO 2: Selección de Servicio o Contingencia (RF2.3) -->
+        <section id="step-2" class="wizard-step hidden">
+            <h2>¿Qué servicio necesitas?</h2>
+            
+            <!-- Opciones estándar -->
+            <div id="opciones-servicio-estandar" class="hidden">
+                <button class="btn-servicio" data-servicio="calidad_pastillas">Solo Cambio de Pastillas</button>
+                <button class="btn-servicio" data-servicio="servicio_integral">Servicio Integral (Pastillas + Rectificado)</button>
+                <button class="btn-servicio" data-servicio="mano_de_obra">Solo Mano de Obra</button>
+            </div>
+
+            <!-- RF2.3: Contingencia Visual (Si el auto no está en el catálogo) -->
+            <div id="panel-contingencia" class="hidden">
+                <p class="helper-text">Tu vehículo no está en nuestra base. Selecciona la silueta que más se parezca:</p>
+                <div class="siluetas-grid">
+                    <button class="btn-silueta" data-tipo="Auto pequeno">🚗<br><small>Auto Pequeño<br>(Spark, Picanto)</small></button>
+                    <button class="btn-silueta" data-tipo="Sedan mediano">🚙<br><small>Sedán Mediano<br>(Corolla, Civic)</small></button>
+                    <button class="btn-silueta" data-tipo="SUV/ Camioneta mediana">🚜<br><small>SUV / Camioneta<br>(Tucson, CR-V)</small></button>
+                    <button class="btn-silueta" data-tipo="SUV grande/ Pickup">🚛<br><small>SUV Grande / Pickup<br>(Hilux, D-Max)</small></button>
+                    <button class="btn-silueta" data-tipo="Vehiculo premium">🏎️<br><small>Vehículo Premium<br>(BMW, Audi)</small></button>
+                </div>
+                <input type="text" id="input-modelo-manual" placeholder="Escribe el modelo de tu vehículo" class="input-manual">
+            </div>
+        </section>
+
+
+        <!-- PASO 3: Resultados Good-Better-Best (Sección 5) -->
+        <section id="step-3" class="wizard-step hidden">
+            <h2>Tu Cotización</h2>
+            <p id="resumen-vehiculo" class="resumen-texto"></p>
+
+            <div id="resultado-triple" class="pricing-container hidden">
+                <!-- Opción URBANO -->
+                <div class="pricing-card" id="card-urbano">
+                    <h3>URBANO</h3>
+                    <p class="precio" id="precio-urbano">$0</p>
+                    <p class="msg-restriccion hidden" id="msg-urbano">No recomendado</p>
+                    <button class="btn-agendar">Agendar Cita</button>
+                </div>
+                
+                <!-- Opción ESTÁNDAR (Destacada) -->
+                <div class="pricing-card destacado" id="card-estandar">
+                    <div class="badge">Más Elegido</div>
+                    <h3>ESTÁNDAR</h3>
+                    <p class="precio" id="precio-estandar">$0</p>
+                    <button class="btn-agendar">Agendar Cita</button>
+                </div>
+
+                <!-- Opción PREMIUM -->
+                <div class="pricing-card" id="card-premium">
+                    <h3>PREMIUM</h3>
+                    <p class="precio" id="precio-premium">$0</p>
+                    <button class="btn-agendar">Agendar Cita</button>
+                </div>
+            </div>
+
+            <div id="resultado-dual" class="pricing-container hidden">
+                <!-- Para Mano de Obra (formato dual según la lógica algorítmica) -->
+                <div class="pricing-card">
+                    <h3>Solo Pastillas</h3>
+                    <p class="precio" id="precio-mo-pastillas">$0</p>
+                </div>
+                <div class="pricing-card destacado">
+                    <h3>Cambio de Discos</h3>
+                    <p class="precio" id="precio-mo-discos">$0</p>
+                </div>
+            </div>
+
+            <button id="btn-reiniciar" class="btn-secondary">Cotizar otro vehículo</button>
+        </section>
+
+    </main>
+
+    <!-- Vinculación a la lógica (se creará después) -->
+    <script src="js/app.js"></script>
+</body>
+</html>

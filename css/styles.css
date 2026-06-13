@@ -1,0 +1,379 @@
+/* =========================================
+   1. RESET Y BASE (Mobile-First)
+   ========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f6f8;
+    color: #1a1a1a;
+    line-height: 1.5;
+    padding-top: 60px; /* Espacio para la barra de estado fija */
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* =========================================
+   2. BARRA DE ESTADO INTERACTIVA (RF1.2)
+   ========================================= */
+.status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 12px 16px;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.status-container {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.status-item {
+    cursor: pointer;
+    font-weight: 600;
+    color: #0056b3;
+    transition: color 0.2s;
+}
+
+.status-item:hover {
+    color: #003d82;
+    text-decoration: underline;
+}
+
+.separator {
+    margin: 0 8px;
+    color: #ccc;
+}
+
+/* =========================================
+   3. WIZARD Y CONTENEDORES
+   ========================================= */
+.wizard-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px 16px;
+}
+
+.wizard-step h2 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: #111;
+}
+
+.helper-text {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 16px;
+}
+
+/* =========================================
+   4. INPUTS Y BUSCADOR PREDICTIVO (RF1.3)
+   ========================================= */
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus {
+    border-color: #0056b3;
+}
+
+.sugerencias-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.sugerencia-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sugerencia-item:hover {
+    background-color: #f0f7ff;
+}
+
+/* =========================================
+   5. ASISTENCIA DE MATRÍCULA (Sección 3)
+   ========================================= */
+.matricula-ayuda {
+    background-color: #e8f4fd;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    border-left: 4px solid #0056b3;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #0056b3;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 0;
+}
+
+.img-matricula {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 6px;
+    margin: 12px 0;
+    border: 1px solid #ccc;
+}
+
+.small-text {
+    font-size: 0.85rem;
+    color: #444;
+}
+
+/* =========================================
+   6. BOTONES PRINCIPALES
+   ========================================= */
+.btn-primary, .btn-secondary, .btn-servicio, .btn-agendar {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 12px;
+}
+
+.btn-primary {
+    background-color: #0056b3;
+    color: white;
+}
+
+.btn-primary:disabled {
+    background-color: #a0c4e8;
+    cursor: not-allowed;
+}
+
+.btn-primary:not(:disabled):hover {
+    background-color: #004494;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #666;
+    border: 2px solid #ddd;
+    margin-top: 24px;
+}
+
+.btn-secondary:hover {
+    background-color: #f0f0f0;
+}
+
+/* =========================================
+   7. SELECCIÓN DE SERVICIO Y CONTINGENCIA (RF2.3)
+   ========================================= */
+.btn-servicio {
+    background-color: white;
+    color: #1a1a1a;
+    border: 2px solid #ddd;
+    text-align: left;
+    margin-bottom: 12px;
+}
+
+.btn-servicio:hover {
+    border-color: #0056b3;
+    background-color: #f0f7ff;
+}
+
+.siluetas-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.btn-silueta {
+    background-color: white;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    padding: 20px 10px;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-silueta small {
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: 8px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.btn-silueta:hover, .btn-silueta.selected {
+    border-color: #0056b3;
+    background-color: #f0f7ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,86,179,0.15);
+}
+
+.input-manual {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+/* =========================================
+   8. RESULTADOS GOOD-BETTER-BEST (Sección 5)
+   ========================================= */
+.resumen-texto {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: #e8f4fd;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.pricing-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pricing-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.pricing-card h3 {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pricing-card .precio {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+}
+
+/* Destacado (Better / Estándar) */
+.pricing-card.destacado {
+    border-color: #0056b3;
+    box-shadow: 0 8px 16px rgba(0,86,179,0.15);
+    transform: scale(1.02);
+}
+
+.pricing-card.destacado h3 {
+    color: #0056b3;
+}
+
+.badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #0056b3;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.msg-restriccion {
+    color: #d32f2f;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background-color: #ffebee;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.btn-agendar {
+    background-color: #28a745;
+    color: white;
+    margin-top: 0;
+}
+
+.btn-agendar:hover {
+    background-color: #218838;
+}
+
+/* Ajuste para dual (Mano de obra) */
+#resultado-dual {
+    flex-direction: row;
+}
+
+#resultado-dual .pricing-card {
+    flex: 1;
+}
+
+/* =========================================
+   9. MEDIA QUERIES (Escritorio / Tablet)
+   ========================================= */
+@media (min-width: 768px) {
+    .pricing-container {
+        flex-direction: row;
+        align-items: stretch;
+    }
+    
+    .pricing-card {
+        flex: 1;
+    }
+
+    .siluetas-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

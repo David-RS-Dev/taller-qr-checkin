@@ -1,0 +1,722 @@
+/* ==========================================================================
+   1. VARIABLES, RESETEO Y ESTILOS BASE
+   ========================================================================== */
+:root {
+    --primary-color: #1a365d;       /* Azul corporativo profundo */
+    --secondary-color: #2b6cb0;     /* Azul interactivo */
+    --accent-color: #319795;        /* Verde turquesa para destacar */
+    --urbano-color: #718096;        /* Gris para la opción económica */
+    --premium-color: #b7791f;       /* Dorado/Bronce para alta gama */
+    --bg-app: #f7fafc;              /* Fondo gris ultra claro texturizado */
+    --card-bg: #ffffff;             /* Fondo de tarjetas */
+    --text-main: #2d3748;           /* Texto principal legible */
+    --text-muted: #718096;          /* Texto secundario */
+    --border-color: #e2e8f0;        /* Bordes suaves */
+    --radius: 12px;                 /* Esquinas redondeadas modernas */
+    --transition: all 0.25s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent; /* Elimina el destello azul en móviles */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #e2e8f0; /* Fondo externo simulando entorno de escritorio */
+    color: var(--text-main);
+    line-height: 1.5;
+    display: flex;
+    justify-content: center;
+}
+
+/* Contenedor tipo "App de Celular" para pruebas y producción en Vercel */
+.app-container {
+    width: 100%;
+    max-width: 480px; /* Ancho estándar de un teléfono móvil grande */
+    min-height: 100vh;
+    background-color: var(--bg-app);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-bottom: 40px;
+}
+
+/* ==========================================================================
+   2. ENCABEZADO Y BARRA DE ESTADO INTERACTIVA (WIZARD)
+   ========================================================================== */
+.app-header {
+    background-color: var(--card-bg);
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-zone h2 {
+    font-size: 16px;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.logo-zone i {
+    margin-right: 6px;
+}
+
+/* Barra de progreso secuencial */
+.wizard-progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    flex: 1;
+    opacity: 0.5;
+    transition: var(--transition);
+}
+
+.step-indicator.active {
+    opacity: 1;
+}
+
+.step-icon {
+    width: 36px;
+    height: 36px;
+    background-color: var(--bg-app);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    transition: var(--transition);
+}
+
+.step-indicator.active .step-icon {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: #ffffff;
+}
+
+.step-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    max-width: 75px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.step-indicator.active .step-text {
+    color: var(--secondary-color);
+}
+
+.step-divider {
+    height: 2px;
+    background-color: var(--border-color);
+    flex: 0.5;
+    margin-bottom: 18px;
+}
+
+/* ==========================================================================
+   3. ELEMENTOS DE CONTROL, BOTONES Y TARJETAS
+   ========================================================================== */
+.wizard-step {
+    display: none; /* Oculta los pasos por defecto */
+    padding: 20px 16px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.wizard-step.active {
+    display: block; /* Muestra solo el paso activo controlado por JS */
+}
+
+.step-instruction h3 {
+    font-size: 18px;
+    color: var(--primary-color);
+    margin-bottom: 6px;
+}
+
+.step-instruction p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+/* Botones genéricos de gran tamaño táctil */
+button {
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 15px;
+    transition: var(--transition);
+}
+
+.btn-primary-block {
+    width: 100%;
+    background-color: var(--secondary-color);
+    color: #ffffff;
+    padding: 14px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(43, 108, 176, 0.2);
+}
+
+.btn-primary-block:active {
+    transform: scale(0.98);
+    background-color: var(--primary-color);
+}
+
+.btn-secondary {
+    width: 100%;
+    background-color: #edf2f7;
+    color: var(--secondary-color);
+    padding: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:active {
+    background-color: #e2e8f0;
+}
+
+.btn-text {
+    background: none;
+    color: var(--secondary-color);
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ==========================================================================
+   4. MODULO 1: BUSCADOR PREDICTIVO Y ASISTENCIA (PASO 1)
+   ========================================================================== */
+.search-card, .helper-card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.search-card h4, .helper-card h4 {
+    font-size: 14px;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 40px 14px 14px;
+    font-size: 15px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    outline: none;
+    color: var(--text-main);
+    transition: var(--transition);
+}
+
+.input-group input:focus {
+    border-color: var(--secondary-color);
+}
+
+#clear-search-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    color: var(--text-muted);
+    font-size: 18px;
+}
+
+/* Desplegable predictivo (Resultados) */
+.suggestions-list {
+    list-style: none;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    max-height: 220px;
+    overflow-y: auto;
+    margin-top: -4px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+}
+
+.suggestions-list li {
+    padding: 14px;
+    font-size: 15px;
+    border-bottom: 1px solid var(--bg-app);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.suggestions-list li:active {
+    background-color: #f0f4f8;
+}
+
+.suggestions-list li span.badge-tipo {
+    font-size: 11px;
+    background-color: #edf2f7;
+    color: var(--text-muted);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.contingency-trigger {
+    text-align: center;
+    margin: 24px 0 12px 0;
+}
+
+.contingency-trigger p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+/* ==========================================================================
+   5. CONTINGENCIA VISUAL POR SILUETAS (BOTONES GRANDES)
+   ========================================================================== */
+.section-divider {
+    border: 0;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 20px 0;
+}
+
+.contingency-container h4 {
+    font-size: 14px;
+    color: var(--text-main);
+    margin-bottom: 14px;
+}
+
+.contingency-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.silhouette-card {
+    background-color: var(--card-bg);
+    border: 2px solid var(--border-color);
+    padding: 16px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.silhouette-card:active, .silhouette-card.selected {
+    border-color: var(--secondary-color);
+    background-color: #f0f4f8;
+}
+
+.car-emoji {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+.silhouette-card h5 {
+    font-size: 13px;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.silhouette-card p {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* El elemento Premium ocupa todo el ancho horizontal de la rejilla */
+.premium-silhouette {
+    grid-column: span 2;
+    border-color: #ebd5b3;
+}
+.premium-silhouette:active, .premium-silhouette.selected {
+    border-color: var(--premium-color);
+    background-color: #fffaf0;
+}
+
+.manual-input-row {
+    background-color: var(--card-bg);
+    padding: 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    margin-top: 16px;
+}
+
+.manual-input-row label {
+    font-size: 13px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.manual-input-row input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+/* ==========================================================================
+   6. SELECCIÓN DE SERVICIOS (PASO 2)
+   ========================================================================== */
+.services-vertical-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.service-selection-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    text-align: left;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+}
+
+.service-selection-card:active {
+    border-color: var(--secondary-color);
+    background-color: #f0f4f8;
+}
+
+.service-icon {
+    font-size: 24px;
+    color: var(--secondary-color);
+    width: 44px;
+}
+
+.service-details {
+    flex: 1;
+    padding: 0 10px;
+}
+
+.service-details h4 {
+    font-size: 15px;
+    color: var(--primary-color);
+    margin-bottom: 2px;
+}
+
+.service-details p {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.service-arrow {
+    color: var(--border-color);
+    font-size: 14px;
+}
+
+/* ==========================================================================
+   7. PANTALLA COMERCIAL: TERNA GOOD-BETTER-BEST (PASO 3)
+   ========================================================================== */
+.pricing-tiers-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tier-card {
+    background-color: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+.tier-card h4 {
+    font-size: 16px;
+    margin-top: 6px;
+}
+
+.tier-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 6px 0 14px 0;
+}
+
+.tier-price {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: baseline;
+}
+
+.tier-price .currency {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.tier-price .amount {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1;
+    margin: 0 2px;
+}
+
+.tier-price .tax-tag {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.btn-select-tier {
+    width: 100%;
+    padding: 12px;
+    background-color: #edf2f7;
+    color: var(--text-main);
+    font-size: 14px;
+}
+
+/* Badges decorativas de nivel */
+.tier-badge {
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    color: #ffffff;
+}
+.urbano-badge { background-color: var(--urbano-color); }
+.estandar-badge { background-color: var(--accent-color); }
+.premium-badge { background-color: var(--premium-color); }
+
+/* PSICOLOGÍA DE CONSUMIDOR: RESALTADO DE LA OPCIÓN ESTÁNDAR (BETTER) */
+.tier-card.featured-tier {
+    border-color: var(--accent-color);
+    background-color: #f0fff4; /* Fondo sutilmente verdoso/limpio */
+    transform: scale(1.02); /* Efecto visual de jerarquía */
+    box-shadow: 0 6px 16px rgba(49, 151, 149, 0.15);
+}
+
+.tier-card.featured-tier h4 {
+    color: #234e52;
+}
+
+.btn-featured {
+    background-color: var(--accent-color);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(49, 151, 149, 0.3);
+}
+.btn-featured:active {
+    background-color: #234e52;
+}
+
+/* MANEJO DE LA RESTRICCIÓN PREMIUM (OCULTADO/BLOQUEO DE URBANO) */
+.tier-card.restricted {
+    opacity: 0.6;
+    border-color: #fed7d7;
+    background-color: #fff5f5;
+}
+
+.tier-card.restricted .tier-price,
+.tier-card.restricted .btn-select-tier {
+    display: none; /* Oculta el precio y botón si está restringido */
+}
+
+.restriction-msg {
+    color: #c53030;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ESTRUCTURA DUAL (MANO DE OBRA) */
+.pricing-dual-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dual-option-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dual-option-cost {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+.dual-option-cost small {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.pricing-disclaimer {
+    margin-top: 24px;
+    padding: 0 4px;
+}
+
+.pricing-disclaimer p {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: justify;
+}
+
+/* ==========================================================================
+   8. COMPONENTE MODAL (GUÍA DE MATRÍCULA DE ECUADOR)
+   ========================================================================== */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 32, 44, 0.6); /* Fondo oscurecido traslúcido */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h4 {
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.close-modal-btn {
+    background: none;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 300;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.modal-body p {
+    font-size: 13px;
+    color: var(--text-main);
+    margin-bottom: 14px;
+}
+
+/* Simulación visual o plano de la matrícula oficial */
+.matricula-blueprint {
+    background-color: #ffffff;
+    border: 2px dashed var(--secondary-color);
+    border-radius: 6px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 11px;
+    background-color: #fcfcf6; /* Tono papel antiguo/oficial */
+    margin-bottom: 14px;
+}
+
+.blueprint-header {
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.blueprint-row {
+    padding: 3px 0;
+    color: #4a5568;
+}
+
+.blueprint-row.highlight-field {
+    background-color: #fff3cd; /* Resaltado amarillo tipo marcador */
+    border-left: 3px solid #f6ad55;
+    padding-left: 4px;
+    margin: 2px 0;
+}
+
+.helper-explanation ul {
+    list-style: none;
+}
+
+.helper-explanation li {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 6px;
+}
+
+.text-success { color: var(--accent-color); }
+.modal-footer { padding: 0 16px 16px 16px; }
+
+/* ==========================================================================
+   9. UTILIDADES Y ANIMACIONES
+   ========================================================================== */
+.hidden {
+    display: none !important; /* Fuerza el ocultamiento */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}

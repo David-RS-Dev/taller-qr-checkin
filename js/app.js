@@ -1,322 +1,301 @@
-/* =========================================
-   ESTADO GLOBAL DE LA APLICACIÓN
-   ========================================= */
-let catalogo = {};
-let tarifas = {};
-let estado = {
-    paso: 1,
-    marca: null,
-    modelo: null,
-    tipoVehiculo: null,
-    servicio: null,
-    esContingencia: false,
-    modeloManual: ""
+/* ==========================================================================
+   1. ESTADO GLOBAL DE LA APLICACIÓN
+   ========================================================================== */
+let datosCatalogo = null;
+let datosTarifas = null;
+
+// Objeto para almacenar las elecciones del cliente a lo largo del flujo
+const cotizacionCliente = {
+    marca: "",
+    modelo: "",
+    tipoVehiculo: "", // "Auto pequeno", "Sedan mediano", etc.
+    servicio: ""      // "calidad_pastillas", "servicio_integral", "mano_de_obra"
 };
 
-/* =========================================
-   1. INICIALIZACIÓN Y CARGA DE DATOS
-   ========================================= */
-document.addEventListener('DOMContentLoaded', async () => {
-    await cargarDatos();
-    configurarEventListeners();
+/* ==========================================================================
+   2. INICIALIZACIÓN Y CARGA DE DATOS (JSON SEPARADOS)
+   ========================================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+    // Carga paralela de ambos archivos JSON usando promesas para mayor velocidad en Vercel
+    Promise.all([
+        fetch('data/catalogo.json').then(res => {
+            if (!res.ok) throw new Error('No se pudo cargar catalogo.json');
+            return res.json();
+        }),
+        fetch('data/tarifas.json').then(res => {
+            if (!res.ok) throw new Error('No se pudo cargar tarifas.json');
+            return res.json();
+        })
+    ])
+    .then(([catalogo, tarifas]) => {
+        datosCatalogo = catalogo;
+        datosTarifas = tarifas;
+        console.log("🚀 Base de datos y matriz de tarifas cargadas con éxito.");
+        inicializarBuscadorPredictivo();
+    })
+    .catch(error => {
+        console.error("❌ Error crítico en la inicialización de datos:", error);
+        alert("Hubo un inconveniente al cargar el catálogo técnico. Por favor, refresca la página.");
+    });
 });
 
-async function cargarDatos() {
-    try {
-        // Carga independiente de la Base de Datos (JSON)
-        const resCatalogo = await fetch('data/catalogo.json');
-        const resTarifas = await fetch('data/tarifas.json');
-        
-        catalogo = await resCatalogo.json();
-        tarifas = await resTarifas.json();
-    } catch (error) {
-        console.error("Error cargando la base de datos:", error);
-        alert("Error de conexión. Por favor, recarga la página.");
-    }
-}
+/* ==========================================================================
+   3. ALGORITMO DE BÚSQUEDA PREDICTIVA BILATERAL (Escribir y Borrar)
+   ========================================================================== */
+function inicializarBuscadorPredictivo() {
+    const searchInput = document.getElementById("search-input");
+    const resultsList = document.getElementById("predictive-results");
+    const clearBtn = document.getElementById("clear-search-btn");
 
-/* =========================================
-   2. CONFIGURACIÓN DE EVENTOS (RF1.3, RF2.3)
-   ========================================= */
-function configurarEventListeners() {
-    // Buscador predictivo de Marca
-    document.getElementById('input-marca').addEventListener('input', (e) => {
-        const texto = e.target.value.toLowerCase();
-        mostrarSugerencias('sugerencias-marca', Object.keys(catalogo), texto, seleccionarMarca);
-        if (texto.length > 0) document.getElementById('sugerencias-marca').classList.remove('hidden');
-        else document.getElementById('sugerencias-marca').classList.add('hidden');
-    });
+    searchInput.addEventListener("input", (e) => {
+        const textoBusqueda = e.target.value.toLowerCase().trim();
 
-    // Buscador predictivo de Modelo
-    document.getElementById('input-modelo').addEventListener('input', (e) => {
-        if (!estado.marca) return;
-        const texto = e.target.value.toLowerCase();
-        const modelos = Object.keys(catalogo[estado.marca].modelos || catalogo[estado.marca]); // Soporta ambas estructuras
-        mostrarSugerencias('sugerencias-modelo', modelos, texto, seleccionarModelo);
-        if (texto.length > 0) document.getElementById('sugerencias-modelo').classList.remove('hidden');
-        else document.getElementById('sugerencias-modelo').classList.add('hidden');
-    });
-
-    // Toggle de Ayuda de Matrícula (Sección 3)
-    document.getElementById('btn-ayuda-matricula').addEventListener('click', () => {
-        document.getElementById('panel-matricula').classList.toggle('hidden');
-    });
-
-    // Botón Continuar (Paso 1 -> 2)
-    document.getElementById('btn-continuar-1').addEventListener('click', procesarSiguientePaso);
-
-    // Selección de Servicio Estándar
-    document.querySelectorAll('.btn-servicio').forEach(btn => {
-        btn.addEventListener('click', () => {
-            estado.servicio = btn.dataset.servicio;
-            estado.esContingencia = false;
-            calcularYMostrarPrecios();
-        });
-    });
-
-    // Selección de Silueta en Contingencia (RF2.3)
-    document.querySelectorAll('.btn-silueta').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.btn-silueta').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            estado.tipoVehiculo = btn.dataset.tipo;
-            estado.modeloManual = document.getElementById('input-modelo-manual').value || "No especificado";
-            document.getElementById('btn-continuar-contingencia').disabled = false;
-        });
-    });
-
-    // Botón Continuar Contingencia
-    document.getElementById('btn-continuar-contingencia')?.addEventListener('click', () => {
-        estado.esContingencia = true;
-        estado.servicio = "calidad_pastillas"; // Default para contingencia
-        guardarEnColaContingencia(); // RF2.4
-        calcularYMostrarPrecios();
-    });
-
-    // Reiniciar
-    document.getElementById('btn-reiniciar').addEventListener('click', reiniciarApp);
-}
-
-/* =========================================
-   3. LÓGICA DEL WIZARD Y NAVEGACIÓN (RF1.1, RF1.2)
-   ========================================= */
-function mostrarSugerencias(idContenedor, lista, texto, callback) {
-    const contenedor = document.getElementById(idContenedor);
-    contenedor.innerHTML = '';
-    const filtrados = lista.filter(item => item.toLowerCase().includes(texto));
-    
-    filtrados.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'sugerencia-item';
-        div.textContent = item;
-        div.addEventListener('click', () => {
-            callback(item);
-            contenedor.classList.add('hidden');
-        });
-        contenedor.appendChild(div);
-    });
-}
-
-function seleccionarMarca(marca) {
-    estado.marca = marca;
-    document.getElementById('input-marca').value = marca;
-    document.getElementById('grupo-modelo').classList.remove('hidden');
-    document.getElementById('input-modelo').value = '';
-    document.getElementById('input-modelo').focus();
-    validarPaso1();
-    actualizarBarraEstado();
-}
-
-function seleccionarModelo(modelo) {
-    estado.modelo = modelo;
-    document.getElementById('input-modelo').value = modelo;
-    validarPaso1();
-    actualizarBarraEstado();
-}
-
-function validarPaso1() {
-    const btn = document.getElementById('btn-continuar-1');
-    btn.disabled = !(estado.marca && estado.modelo);
-}
-
-function procesarSiguientePaso() {
-    // Verificar si el modelo existe en el catálogo para obtener su tipo
-    const datosModelo = catalogo[estado.marca]?.modelos?.[estado.modelo] || catalogo[estado.marca]?.[estado.modelo];
-    
-    if (datosModelo && datosModelo.tipo) {
-        estado.tipoVehiculo = datosModelo.tipo;
-        estado.esContingencia = false;
-        irAlPaso(2);
-    } else {
-        // RF2.3: Activar modo contingencia si no está catalogado
-        activarModoContingencia();
-    }
-}
-
-function activarModoContingencia() {
-    document.getElementById('opciones-servicio-estandar').classList.add('hidden');
-    document.getElementById('panel-contingencia').classList.remove('hidden');
-    // Crear botón de continuar para contingencia si no existe
-    if (!document.getElementById('btn-continuar-contingencia')) {
-        const btn = document.createElement('button');
-        btn.id = 'btn-continuar-contingencia';
-        btn.className = 'btn-primary';
-        btn.textContent = 'Cotizar con esta categoría';
-        btn.disabled = true;
-        document.getElementById('panel-contingencia').appendChild(btn);
-        btn.addEventListener('click', () => {
-            estado.esContingencia = true;
-            estado.modeloManual = document.getElementById('input-modelo-manual').value || "No especificado";
-            estado.servicio = "calidad_pastillas";
-            guardarEnColaContingencia();
-            calcularYMostrarPrecios();
-        });
-    }
-    irAlPaso(2);
-}
-
-function irAlPaso(paso) {
-    estado.paso = paso;
-    document.querySelectorAll('.wizard-step').forEach(el => el.classList.add('hidden'));
-    document.getElementById(`step-${paso}`).classList.remove('hidden');
-    
-    if (paso === 2 && !estado.esContingencia) {
-        document.getElementById('opciones-servicio-estandar').classList.remove('hidden');
-        document.getElementById('panel-contingencia').classList.add('hidden');
-    }
-    actualizarBarraEstado();
-    window.scrollTo(0, 0);
-}
-
-function actualizarBarraEstado() {
-    const bar = document.getElementById('status-bar');
-    if (estado.paso > 1) bar.classList.remove('hidden');
-    
-    document.getElementById('status-marca').textContent = estado.marca || 'Marca';
-    document.getElementById('status-modelo').textContent = estado.modelo || (estado.esContingencia ? estado.modeloManual : 'Modelo');
-    document.getElementById('status-servicio').textContent = estado.servicio ? 'Servicio' : 'Servicio';
-}
-
-// RF1.2: Retorno inmediato al tocar la barra
-window.volverAPaso = function(paso) {
-    if (paso === 1) {
-        estado.marca = null;
-        estado.modelo = null;
-        estado.tipoVehiculo = null;
-        estado.esContingencia = false;
-        document.getElementById('input-marca').value = '';
-        document.getElementById('input-modelo').value = '';
-        document.getElementById('grupo-modelo').classList.add('hidden');
-        document.getElementById('btn-continuar-1').disabled = true;
-    } else if (paso === 2) {
-        estado.servicio = null;
-        estado.esContingencia = false;
-    }
-    irAlPaso(paso);
-};
-
-/* =========================================
-   4. LÓGICA ALGORÍTMICA DE PRECIOS (Sección 5)
-   ========================================= */
-function calcularYMostrarPrecios() {
-    const resultado = procesarPreciosCliente(estado.tipoVehiculo, estado.servicio);
-    
-    document.getElementById('resumen-vehiculo').textContent = 
-        `${estado.marca} ${estado.modelo || estado.modeloManual} (${estado.tipoVehiculo})`;
-
-    if (resultado.formato === 'triple') {
-        document.getElementById('resultado-triple').classList.remove('hidden');
-        document.getElementById('resultado-dual').classList.add('hidden');
-        
-        // Renderizar URBANO
-        if (resultado.urbano.activo) {
-            document.getElementById('precio-urbano').textContent = `$${resultado.urbano.valor}`;
-            document.getElementById('msg-urbano').classList.add('hidden');
-            document.getElementById('card-urbano').style.opacity = '1';
-        } else {
-            document.getElementById('precio-urbano').textContent = '-';
-            document.getElementById('msg-urbano').classList.remove('hidden');
-            document.getElementById('card-urbano').style.opacity = '0.6';
+        // Si el usuario borra todo el texto, reseteamos el estado visual
+        if (textoBusqueda === "") {
+            resultsList.innerHTML = "";
+            resultsList.classList.add("hidden");
+            clearBtn.classList.add("hidden");
+            document.getElementById("contingency-block").classList.add("hidden");
+            return;
         }
-        
-        // Renderizar ESTÁNDAR
-        document.getElementById('precio-estandar').textContent = `$${resultado.estandar.valor}`;
-        
-        // Renderizar PREMIUM
-        document.getElementById('precio-premium').textContent = `$${resultado.premium.valor}`;
-        
-    } else if (resultado.formato === 'dual') {
-        document.getElementById('resultado-triple').classList.add('hidden');
-        document.getElementById('resultado-dual').classList.remove('hidden');
-        document.getElementById('precio-mo-pastillas').textContent = `$${resultado.opcionA}`;
-        document.getElementById('precio-mo-discos').textContent = `$${resultado.opcionB}`;
-    }
 
-    irAlPaso(3);
+        clearBtn.classList.remove("hidden");
+        resultsList.innerHTML = ""; // Limpiamos coincidencias previas de la pantalla
+
+        let coincidenciasEncontradas = 0;
+
+        // Recorremos las marcas del JSON
+        for (const marca in datosCatalogo) {
+            const marcaMinuscula = marca.toLowerCase();
+            
+            // Evaluamos todos los modelos dentro de esta marca
+            for (const modelo in datosCatalogo[marca]) {
+                const modeloMinuscula = modelo.toLowerCase();
+                const cadenaCombinada = `${marcaMinuscula} ${modeloMinuscula}`;
+
+                // El algoritmo evalúa si lo escrito coincide con la marca, el modelo o la combinación de ambos
+                if (marcaMinuscula.includes(textoBusqueda) || 
+                    modeloMinuscula.includes(textoBusqueda) || 
+                    cadenaCombinada.includes(textoBusqueda)) {
+                    
+                    coincidenciasEncontradas++;
+                    
+                    // Creamos el elemento interactivo en la lista desplegable
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                        <strong>${marca} ${modelo}</strong>
+                        <span class="badge-tipo">${traducirCategoriaUI(datosCatalogo[marca][modelo].tipo)}</span>
+                    `;
+                    
+                    // Al hacer clic, se selecciona el auto de forma automática
+                    li.addEventListener("click", () => {
+                        seleccionarVehiculoOficial(marca, modelo, datosCatalogo[marca][modelo].tipo);
+                    });
+
+                    resultsList.appendChild(li);
+                }
+            }
+        }
+
+        // Si hay resultados, quitamos el 'hidden'. Si está vacío (no existe el auto), activamos contingencia visual
+        if (coincidenciasEncontradas > 0) {
+            resultsList.classList.remove("hidden");
+            document.getElementById("contingency-block").classList.add("hidden");
+        } else {
+            resultsList.classList.add("hidden");
+            activarContingencia(); // Abre automáticamente las siluetas si el cliente digita algo inexistente
+        }
+    });
+
+    // Botón de limpieza rápida (X) en el buscador
+    clearBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        searchInput.focus();
+        resultsList.innerHTML = "";
+        resultsList.classList.add("hidden");
+        clearBtn.classList.add("hidden");
+        document.getElementById("contingency-block").classList.add("hidden");
+    });
 }
 
-// Adaptación exacta de la función del documento, usando el JSON externo
-function procesarPreciosCliente(tipoVehiculo, servicioSeleccionado) {
-    const datos = tarifas[tipoVehiculo][servicioSeleccionado];
-    
-    if (servicioSeleccionado === "mano_de_obra") {
-        return { 
-            formato: "dual", 
-            opcionA: datos.solo_pastillas, 
-            opcionB: datos.cambio_discos 
-        };
-    } else {
-        return { 
-            formato: "triple", 
-            urbano: datos.URBANO === null ? { activo: false, msg: "No recomendado" } : { activo: true, valor: datos.URBANO },
-            estandar: { activo: true, valor: datos.ESTANDAR, destacado: true },
-            premium: { activo: true, valor: datos.PREMIUM }
-        };
-    }
-}
-
-/* =========================================
-   5. GESTIÓN DE CONTINGENCIAS (RF2.4)
-   ========================================= */
-async function guardarEnColaContingencia() {
-    const nuevoRegistro = {
-        fecha: new Date().toISOString(),
-        marca: estado.marca,
-        modelo_manual: estado.modeloManual,
-        tipo_seleccionado: estado.tipoVehiculo,
-        estado: "pendiente_aprobacion"
+// Función auxiliar para mostrar un texto más amigable en los Badges del buscador móvil
+function traducirCategoriaUI(tipoClave) {
+    const traducciones = {
+        "Auto pequeno": "Auto Pequeño",
+        "Sedan mediano": "Sedán",
+        "SUV/ Camioneta mediana": "SUV Mediana",
+        "SUV grande/ Pickup": "Camioneta/Pickup",
+        "Vehiculo premium": "Premium"
     };
-
-    // NOTA PARA DESPLIEGUE EN VERCEL:
-    // Un archivo JSON estático no puede ser modificado directamente por el frontend.
-    // Para que esto funcione en producción, este fetch debe apuntar a una API Route de Vercel
-    // o a un servicio externo como Supabase, Firebase o Airtable.
-    // Por ahora, lo simulamos en consola y localStorage para pruebas locales.
-    
-    console.log("📥 Guardando en cola de aprobación:", nuevoRegistro);
-    
-    let cola = JSON.parse(localStorage.getItem('cola_contingencias') || '[]');
-    cola.push(nuevoRegistro);
-    localStorage.setItem('cola_contingencias', JSON.stringify(cola));
-    
-    /* DESCOMENTAR CUANDO TENGAS TU BACKEND / API ROUTE:
-    try {
-        await fetch('/api/guardar-contingencia', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(nuevoRegistro)
-        });
-    } catch (e) { console.error("Error guardando cola", e); }
-    */
+    return traducciones[tipoClave] || tipoClave;
 }
 
-function reiniciarApp() {
-    estado = { paso: 1, marca: null, modelo: null, tipoVehiculo: null, servicio: null, esContingencia: false, modeloManual: "" };
-    document.getElementById('input-marca').value = '';
-    document.getElementById('input-modelo').value = '';
-    document.getElementById('grupo-modelo').classList.add('hidden');
-    document.getElementById('status-bar').classList.add('hidden');
-    document.querySelectorAll('.btn-silueta').forEach(b => b.classList.remove('selected'));
-    document.getElementById('input-modelo-manual').value = '';
-    irAlPaso(1);
+/* ==========================================================================
+   4. CONTROL DE SELECCIÓN Y FLUJO DE CONTINGENCIA
+   ========================================================================== */
+function seleccionarVehiculoOficial(marca, modelo, tipoClave) {
+    cotizacionCliente.marca = marca;
+    cotizacionCliente.modelo = modelo;
+    cotizacionCliente.tipoVehiculo = tipoClave;
+
+    // Actualizamos la barra de estado superior interactiva
+    document.getElementById("summary-vehiculo").textContent = `${marca} ${modelo}`;
+    
+    // Ocultamos la lista desplegable y avanzamos al paso de Servicios
+    document.getElementById("predictive-results").classList.add("hidden");
+    irAPaso(2);
+}
+
+function activarContingencia() {
+    const contingencyBlock = document.getElementById("contingency-block");
+    contingencyBlock.classList.remove("hidden");
+    // Desplazamos suavemente la pantalla del celular hacia las siluetas
+    contingencyBlock.scrollIntoView({ behavior: 'smooth' });
+}
+
+function seleccionarPorSilueta(tipoClave) {
+    // Quitamos la selección previa visual de todas las tarjetas de siluetas
+    document.querySelectorAll(".silhouette-card").forEach(card => card.classList.remove("selected"));
+    
+    // Resaltamos visualmente la silueta pulsada
+    const botonPresionado = event.currentTarget;
+    botonPresionado.classList.add("selected");
+
+    cotizacionCliente.tipoVehiculo = tipoClave;
+}
+
+function confirmarVehiculoManual() {
+    const customName = document.getElementById("custom-car-name").value.trim();
+    
+    if (!cotizacionCliente.tipoVehiculo) {
+        alert("Por favor, selecciona una de las siluetas visuales para calcular tu tarifa.");
+        return;
+    }
+
+    // Si el cliente no escribió nada, asignamos un nombre genérico por la carrocería elegida
+    if (customName === "") {
+        cotizacionCliente.marca = "Auto";
+        cotizacionCliente.modelo = traducirCategoriaUI(cotizacionCliente.tipoVehiculo);
+    } else {
+        cotizacionCliente.marca = customName;
+        cotizacionCliente.modelo = "";
+    }
+
+    document.getElementById("summary-vehiculo").textContent = cotizacionCliente.marca;
+    irAPaso(2);
+}
+
+/* ==========================================================================
+   5. SELECCIÓN DE SERVICIO Y LÓGICA DE TARIFAS (PASO 2 Y 3)
+   ========================================================================== */
+function seleccionarServicio(servicioClave) {
+    cotizacionCliente.servicio = servicioClave;
+    
+    // Actualizamos el resumen en la barra superior interactiva
+    const etiquetasServicio = {
+        "calidad_pastillas": "Solo Pastillas",
+        "servicio_integral": "S. Integral",
+        "mano_de_obra": "Mano de Obra"
+    };
+    document.getElementById("summary-servicio").textContent = etiquetasServicio[servicioClave];
+
+    // Procesamos matemáticamente los precios antes de mostrar la pantalla final
+    calcularYDesplegarPrecios();
+    irAPaso(3);
+}
+
+function calcularYDesplegarPrecios() {
+    const tipo = cotizacionCliente.tipoVehiculo;
+    const servicio = cotizacionCliente.servicio;
+
+    const tierContainer = document.getElementById("tier-pricing-container");
+    const dualContainer = document.getElementById("dual-pricing-container");
+    const subtitulo = document.getElementById("prices-subtitle");
+
+    subtitulo.textContent = `Precios calculados para tu ${cotizacionCliente.marca} ${cotizacionCliente.modelo}`;
+
+    // CASO A: SERVICIO DE MANO DE OBRA (Estructura de Tarjetas Duales)
+    if (servicio === "mano_de_obra") {
+        tierContainer.classList.add("hidden");
+        dualContainer.classList.remove("hidden");
+
+        const costosManoObra = datosTarifas[tipo]["mano_de_obra"];
+        document.getElementById("price-dual-pastillas").textContent = costosManoObra.solo_pastillas;
+        document.getElementById("price-dual-discos").textContent = costosManoObra.cambio_discos;
+    } 
+    // CASO B: PASTILLAS O SERVICIO INTEGRAL (Estructura Terna Good-Better-Best)
+    else {
+        dualContainer.classList.add("hidden");
+        tierContainer.classList.remove("hidden");
+
+        const bloqueTarifas = datosTarifas[tipo][servicio];
+        const tarjetaUrbana = document.getElementById("tier-URBANO");
+        const msgRestriccion = document.getElementById("restriction-urbano-msg");
+
+        // EVALUACIÓN DE LA RESTRICCIÓN PREMIUM (Valores en null en tarifas.json)
+        if (bloqueTarifas.URBANO === null) {
+            tarjetaUrbana.classList.add("restricted");
+            msgRestriccion.classList.remove("hidden");
+        } else {
+            tarjetaUrbana.classList.remove("restricted");
+            msgRestriccion.classList.add("hidden");
+            document.getElementById("price-urbano-val").textContent = bloqueTarifas.URBANO;
+        }
+
+        // Inyección directa de las opciones Estándar y Premium
+        document.getElementById("price-estandar-val").textContent = bloqueTarifas.ESTANDAR;
+        document.getElementById("price-premium-val").textContent = bloqueTarifas.PREMIUM;
+    }
+}
+
+/* ==========================================================================
+   6. NAVEGACIÓN ENTRE PASOS (WIZARD CONTROL)
+   ========================================================================== */
+function irAPaso(numeroPaso) {
+    // Si intenta ir a pasos avanzados sin datos, detenemos la ejecución
+    if (numeroPaso === 2 && !cotizacionCliente.tipoVehiculo) return;
+    if (numeroPaso === 3 && !cotizacionCliente.servicio) return;
+
+    // Control de visibilidad de las secciones mediante clases CSS
+    document.querySelectorAll(".wizard-step").forEach((step, index) => {
+        if (index === (numeroPaso - 1)) {
+            step.classList.add("active");
+        } else {
+            step.classList.remove("active");
+        }
+    });
+
+    // Control de iluminación y estados activos de la barra de progreso interactiva
+    document.querySelectorAll(".step-indicator").forEach((indicator, index) => {
+        if (index <= (numeroPaso - 1)) {
+            indicator.classList.add("active");
+        } else {
+            indicator.classList.remove("active");
+        }
+    });
+
+    // Si el usuario regresa al Paso 1 por la barra superior, limpiamos textos para evitar inconsistencias
+    if (numeroPaso === 1) {
+        document.getElementById("summary-vehiculo").textContent = "Vehículo";
+        document.getElementById("summary-servicio").textContent = "Servicio";
+        cotizacionCliente.servicio = "";
+    }
+}
+
+/* ==========================================================================
+   7. INTERACCIONES DE COMPONENTES DE ASISTENCIA (MODALES)
+   ========================================================================== */
+function mostrarModalMatricula() {
+    document.getElementById("matricula-modal").classList.remove("hidden");
+}
+
+function cerrarModalMatricula() {
+    document.getElementById("matricula-modal").classList.add("hidden");
+}
+
+/* ==========================================================================
+   8. CIERRE DE LA OPERACIÓN COMERCIAL
+   ========================================================================== */
+function finalizarCotizacion(nivelElegido) {
+    alert(`¡Excelente elección! Has seleccionado la alternativa: ${nivelElegido}.\n\nPresenta esta pantalla en la recepción del taller para validar tu cotización.`);
 }
